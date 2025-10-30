@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control de Producción</title>
+</head>
+<body>
+    <h1>Control de Producción</h1>
+
+    <script>
+        let operario = prompt("Ingrese el nombre del operario:");
+        let producto = prompt("Ingrese el tipo de producto (Pieza X, Y o Z):");
+        let costoUnitario = 0;
+
+        switch (producto.toLowerCase()) {
+            case "pieza x":
+                costoUnitario = 4000;
+                break;
+            case "pieza y":
+                costoUnitario = 6000;
+                break;
+            case "pieza z":
+                costoUnitario = 9000;
+                break;
+            default:
+                alert("Producto no válido. Se usará Pieza Y por defecto.");
+                producto = "Pieza Y";
+                costoUnitario = 6000;
+        }
+
+        let piezas = [];
+        let totalPiezas = 0;
+        let continuar;
+
+        do {
+            let cantidad = parseInt(prompt("Ingrese la cantidad de piezas del día:"));
+            if (!isNaN(cantidad) && cantidad > 0) {
+                piezas.push(cantidad);
+                totalPiezas += cantidad;
+            } else {
+                alert("Cantidad no válida. Intente de nuevo.");
+            }
+            continuar = confirm("¿Desea registrar otro día?");
+        } while (continuar);
+
+        let rendimiento = "";
+        if (totalPiezas < 50) {
+            rendimiento = "Bajo rendimiento";
+        } else if (totalPiezas <= 100) {
+            rendimiento = "Rendimiento aceptable";
+        } else {
+            rendimiento = "Rendimiento excelente";
+        }
+
+        let costoTotal = totalPiezas * costoUnitario;
+
+        document.write("<h2>Resultados</h2>");
+        document.write("<p>Operario: " + operario + "</p>");
+        document.write("<p>Producto: " + producto + "</p>");
+        for (let i = 0; i < piezas.length; i++) {
+            document.write("<p>Día " + (i + 1) + ": " + piezas[i] + " piezas</p>");
+        }
+        document.write("<p>Total de piezas: " + totalPiezas + "</p>");
+        document.write("<p>Costo unitario: $" + costoUnitario.toLocaleString() + "</p>");
+        document.write("<p>Costo total: $" + costoTotal.toLocaleString() + "</p>");
+        document.write("<p><b>" + rendimiento + "</b></p>");
+    </script>
+</body>
+</html>
