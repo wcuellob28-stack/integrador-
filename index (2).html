@@ -3,67 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <title>Control de Producción</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .container {
+            max-width: 600px;
+            background-color: white;
+            margin: 40px auto;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        p {
+            line-height: 1.5;
+            margin: 8px 0;
+        }
+
+        b {
+            color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .bajo {
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        .aceptable {
+            color: #f0ad4e;
+            font-weight: bold;
+        }
+
+        .excelente {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>Control de Producción</h1>
 
+    <div class="container" id="resultado"></div>
+
     <script>
-        let operario = prompt("Ingrese el nombre del operario:");
-        let producto = prompt("Ingrese el tipo de producto (Pieza X, Y o Z):");
-        let costoUnitario = 0;
+        let operario = prompt("Nombre del operario:");
+        if (!operario) operario = "Sin nombre";
 
-        switch (producto.toLowerCase()) {
-            case "pieza x":
-                costoUnitario = 4000;
-                break;
-            case "pieza y":
-                costoUnitario = 6000;
-                break;
-            case "pieza z":
-                costoUnitario = 9000;
-                break;
-            default:
-                alert("Producto no válido. Se usará Pieza Y por defecto.");
-                producto = "Pieza Y";
-                costoUnitario = 6000;
-        }
-
-        let piezas = [];
+        let registros = []; 
         let totalPiezas = 0;
+        let costoTotal = 0;
         let continuar;
 
         do {
-            let cantidad = parseInt(prompt("Ingrese la cantidad de piezas del día:"));
+            let producto = prompt("Ingrese el tipo de producto (Pieza X, Y o Z):");
+            let costoUnitario = 0;
+
+            producto = producto ? producto.trim().toLowerCase() : "";
+            switch (producto) {
+                case "pieza x":
+                case "x":
+                    producto = "Pieza X";
+                    costoUnitario = 4000;
+                    break;
+                case "pieza y":
+                case "y":
+                    producto = "Pieza Y";
+                    costoUnitario = 6000;
+                    break;
+                case "pieza z":
+                case "z":
+                    producto = "Pieza Z";
+                    costoUnitario = 9000;
+                    break;
+                default:
+                    alert("Producto no válido. Se usará Pieza Y por defecto.");
+                    producto = "Pieza Y";
+                    costoUnitario = 6000;
+            }
+
+            let cantidad = parseInt(prompt(`Ingrese la cantidad de piezas del día (${producto}):`));
             if (!isNaN(cantidad) && cantidad > 0) {
-                piezas.push(cantidad);
+                registros.push({ producto, cantidad, costoUnitario });
                 totalPiezas += cantidad;
+                costoTotal += cantidad * costoUnitario;
             } else {
                 alert("Cantidad no válida. Intente de nuevo.");
             }
+
             continuar = confirm("¿Desea registrar otro día?");
         } while (continuar);
 
         let rendimiento = "";
+        let claseRend = "";
         if (totalPiezas < 50) {
             rendimiento = "Bajo rendimiento";
+            claseRend = "bajo";
         } else if (totalPiezas <= 100) {
             rendimiento = "Rendimiento aceptable";
+            claseRend = "aceptable";
         } else {
             rendimiento = "Rendimiento excelente";
+            claseRend = "excelente";
         }
 
-        let costoTotal = totalPiezas * costoUnitario;
+        let promedio = (totalPiezas / registros.length).toFixed(2);
 
-        document.write("<h2>Resultados</h2>");
-        document.write("<p>Operario: " + operario + "</p>");
-        document.write("<p>Producto: " + producto + "</p>");
-        for (let i = 0; i < piezas.length; i++) {
-            document.write("<p>Día " + (i + 1) + ": " + piezas[i] + " piezas</p>");
-        }
-        document.write("<p>Total de piezas: " + totalPiezas + "</p>");
-        document.write("<p>Costo unitario: $" + costoUnitario.toLocaleString() + "</p>");
-        document.write("<p>Costo total: $" + costoTotal.toLocaleString() + "</p>");
-        document.write("<p><b>" + rendimiento + "</b></p>");
+        let salida = `
+            <h2>Resultados</h2>
+            <p><b>Operario:</b> ${operario}</p>
+            <hr>
+        `;
+
+        registros.forEach((r, i) => {
+            salida += `
+                <p><b>Día ${i + 1}</b> — ${r.producto}: ${r.cantidad} piezas 
+                (Costo unitario: $${r.costoUnitario.toLocaleString()})</p>`;
+        });
+
+        salida += `
+            <hr>
+            <p><b>Total de piezas:</b> ${totalPiezas}</p>
+            <p><b>Promedio diario:</b> ${promedio}</p>
+            <p><b>Costo total:</b> $${costoTotal.toLocaleString()}</p>
+            <p class="${claseRend}"><b>${rendimiento}</b></p>
+        `;
+
+        document.getElementById("resultado").innerHTML = salida;
     </script>
 </body>
 </html>
